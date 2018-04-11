@@ -7,7 +7,7 @@ module.exports.postFile = function(req,res) {
 
     form.on('fileBegin', function(name, file) {
         file.name = Date.now() + '_' + file.name;
-        file.path = "./uploads/file/" + file.name;
+        file.path = "./server/uploads/file/" + file.name;
         console.log('file.path 1', file.path, file.name);
     })
     form.on('file', function(name, file){
@@ -33,7 +33,7 @@ module.exports.postImage = function (req, res) {
     form.parse(req);
     form.on('fileBegin', function(name, file) {
         file.name = Date.now() + '_' + file.name;
-        file.path = "./uploads/image/" + file.name;
+        file.path = "./server/uploads/image/" + file.name;
     })
     form.on('file', function(name, file){
         console.log('uploaded image', file.name);
@@ -55,7 +55,7 @@ module.exports.postAvatar = function(req, res) {
     form.parse(req);
     form.on('fileBegin', function(name, file) {
         file.name = Date.now() + '_' + file.name;
-        file.path = "./uploads/avatar/" + file.name;
+        file.path = "./server/uploads/avatar/" + file.name;
     })
     form.on('file', function(name, file){
         console.log('uploaded avatar', file.name);
