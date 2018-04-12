@@ -10,7 +10,7 @@ router.post('/user/list', function(req,res) {
 	ctrlUser.getUserList(req,res);
 })
 router.post('/user/info', function(req, res) {
-	ctrlUser.getUserById(req,res);
+	ctrlUser.getUser(req,res);
 })
 router.put('/user/edit', function(req, res){
 	ctrlUser.editUser(req, res);
