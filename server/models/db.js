@@ -6,7 +6,7 @@ var Sequelize = require('sequelize');
 var basename = path.basename(module.filename);
 var sequelize = new Sequelize("chat_angular", "root", "", {
     dialect: 'sqlite',
-    storage: 'chat_angular.sqlite'
+    storage: path.join(__dirname, 'chat_angular.sqlite')
 });
 var Op = Sequelize.Op;
 var db = {};

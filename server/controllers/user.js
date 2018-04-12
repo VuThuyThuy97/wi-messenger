@@ -15,14 +15,22 @@ module.exports.getUserList = function(req, res) {
 		res.send(response(404, 'SOMETHING WENT WRONG'));
 	});
 }
-module.exports.getUserById = function(req, res) {
-	User.findById(req.body.idUser, {
+module.exports.getUser = function(req, res) {
+	User.findOne({
+		where: {
+			username: req.decoded.username
+		},
 		include: {
 			model: models.Conversation,
-			include: models.Message
+			include: {
+				model: models.Message,
+				include: {
+					model: models.User
+				}
+			}
 		}
 	}).then(user=> {
-		if(user && user.id === req.decoded.id){	
+		if(user){	
 			res.send(response(200, 'SUCCESSFULLY', user));
 		} else {
 			res.send(response(404, 'USER NOT FOUND'));

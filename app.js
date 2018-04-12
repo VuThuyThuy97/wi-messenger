@@ -1,9 +1,8 @@
+const PORT = 7000;
 var express = require('express');
 var app = express();
 var server = require('http').Server(app);
-
 var path = require('path');
-
 var io = require('socket.io')(server);
 
 var bodyParser = require('body-parser');
@@ -14,15 +13,13 @@ var routesApi = require('./server/routes/index');
 var uploadRoutesApi = require('./server/routes/upload');
 var authenticate = require('./server/controllers/authenticate/authenticate');
 
-app.use(express.static(path.join(__dirname, '../client')));
-app.use(express.static(path.join(__dirname, '../uploads')));
 app.use(authenticate());
 
 app.use('/upload', uploadRoutesApi);
 app.use('/', routesApi);
 
-server.listen(3000, function () {
-	console.log('listening on port 3000');
+server.listen(PORT, function () {
+	console.log('listening on port ', PORT);
 });
 
 io.on('connection', function (socket) {
