@@ -27,7 +27,6 @@ module.exports = function authenticate() {
                                 req.decoded = user.toJSON();
                                 next();
                             }).catch(err => {
-                                console.log('err', err);
                                 return res.status(401).send(responseJSON(401, 'Failed to authenticate'));
                             });
                         }

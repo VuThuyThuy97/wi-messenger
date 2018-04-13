@@ -1,10 +1,10 @@
-const PORT = 7000;
+const PORT = 5000;
 var express = require('express');
 var app = express();
 var server = require('http').Server(app);
 var path = require('path');
-var io = require('socket.io')(server);
-
+var io = require('./socket.io/socket.io.js');
+io(server);
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(function(req, res, next){
@@ -29,7 +29,8 @@ server.listen(PORT, function () {
 });
 
 io.on('connection', function (socket) {
-	console.log('Connection!');
+	socket.emit('connection', 'wellcome in chat-module');
+
 	socket.on('listRoom', function (data) {
 		data.forEach(function(room) {
 			socket.join(room.id);
