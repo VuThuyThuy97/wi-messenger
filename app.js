@@ -13,10 +13,10 @@ app.use(function(req, res, next){
 	next();
 });
 
-require('./server/models/db');
-var routesApi = require('./server/routes/index');
-var uploadRoutesApi = require('./server/routes/upload');
-var authenticate = require('./server/controllers/authenticate/authenticate');
+require('./database/db-connect');
+var routesApi = require('./routes/index');
+var uploadRoutesApi = require('./routes/upload');
+var authenticate = require('./controllers/authenticate');
 
 app.use(authenticate());
 

@@ -1,10 +1,9 @@
 'use strict';
 var fs = require('fs');
-var md5 = require('md5');
 var path = require('path');
 var Sequelize = require('sequelize');
 var basename = path.basename(module.filename);
-var sequelize = new Sequelize("chat_angular", "root", "", {
+var sequelize = new Sequelize("chat_module", "root", "", {
     dialect: 'sqlite',
     storage: path.join(__dirname, 'chat_angular.sqlite')
 });
@@ -58,30 +57,6 @@ db.Message.belongsTo(db.User, {
     targetKey: 'id'
 });
 sequelize.sync().then(()=>{
-    db.User.create({
-        id: 1,
-        username: 'Admin',
-        password: md5('a'),
-    }).then(data=>{
-        
-    }).catch(err=>{});
-    db.Conversation.create({
-        id: 1,
-        title: 'Chat app',
-    }).then(data=>{
-        let ids = [1];
-        data.setUsers(ids);
-        res.send(data);
-    }).catch(err=>{});
-    db.Message.create({
-        id: 1,
-        message: 'Hello',
-        message_type: 'text',
-        conversation_id: 1,
-        sender_id : 1
-    }).then(data=>{
-        
-    }).catch(err=>{});
     console.log('sync success', db.User);
 }).catch(err=>{
     console.log('sync err');

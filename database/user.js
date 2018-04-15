@@ -12,12 +12,12 @@ module.exports = function (sequelize, DataTypes) {
         },
         password: {
             type: DataTypes.STRING(100),
-            allowNull: false
+            allowNull: true
         },
-        islogin: {
-            type: DataTypes.BOOLEAN,
+        active: {
+            type: DataTypes.STRING,
             allowNull: true,
-            defaultValue: 0
+            defaultValue: 'gray'
         },
         role: {
             type: DataTypes.INTEGER,

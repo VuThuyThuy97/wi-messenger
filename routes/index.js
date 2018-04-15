@@ -9,8 +9,11 @@ var ctrlUser = require('../controllers/user');
 router.post('/user/list', function(req,res) {
 	ctrlUser.getUserList(req,res);
 })
-router.post('/user/info', function(req, res) {
-	ctrlUser.getUser(req,res);
+router.post('/user/infoById', function(req, res) {
+	ctrlUser.getUserById(req,res);
+})
+router.post('/user/infoByToken', function(req, res) {
+	ctrlUser.getUserByToken(req,res);
 })
 router.put('/user/edit', function(req, res){
 	ctrlUser.editUser(req, res);
@@ -19,7 +22,7 @@ router.put('/user/edit', function(req, res){
 router.post('/conversation/message/list', function (req,res) {
 	ctrlMessage.getMessage(req,res);
 })
-router.post('/conversation//message/new', function(req,res) {
+router.post('/conversation/message/new', function(req,res) {
 	ctrlMessage.sendMessage(req,res);
 });
 

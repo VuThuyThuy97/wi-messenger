@@ -1,29 +1,38 @@
-var models = require('../models/db');
-var response = require('../response')
+var models = require('../database/db-connect');
+var response = require('./response')
 var Message = models.Message;
+var User = models.User;
 var Conversation = models.Conversation;
 
 module.exports.sendMessage = function (req, res) {
 	Conversation.findById(req.body.idConversation, {
 		include: {
-			model: models.User,
+			model: User,
 			through: {
 				attributes: ['conversation_id', 'user_id'],
 			}
 		}
 	}).then(conversation => {
-		if(conversation && conversation.Users.find(function(user){return user.id = req.decoded.id})){
+		if(conversation){
 			Message.create({
 				message: req.body.message,
 				message_type: req.body.messageType,
 				conversation_id: req.body.idConversation,
-				sender_id : req.decoded.id
-				
+				sender_id : req.body.idUser
 			}).then(message => {
-				res.send(message);
+				if(message)
+					Message.findById({
+						where: { id: message.id },
+						include: { model: User }
+					}).then(data=>{
+						res.send(response(200, 'SUCCESSFULLY', data));
+					}).catch(err=> {
+
+					});
+				else
+					res.send(response(404, 'SOMETHING WENT WRONG'));
 			}).catch(err => {
-				console.log('--err', err);
-				res.send(response(404, 'CREATE MESSAGE FAIL'));
+				res.send(response(404, 'CREATE MESSAGE FAIL', err));
 			});
 		} else {
 			res.send(response(404, 'CONVERSATION NOT FOUND'));

@@ -1,7 +1,7 @@
 "use strict";
-const User = require('../../models/db').User;
+const User = require('../database/db-connect').User;
 const jwt = require('jsonwebtoken');
-let responseJSON = require('../../response');
+let responseJSON = require('./response');
 
 module.exports = function authenticate() {
     return function (req, res, next) {
