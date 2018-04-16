@@ -3,9 +3,12 @@ var express = require('express');
 var app = express();
 var server = require('http').Server(app);
 var path = require('path');
-var io = require('./socket.io/socket.io')(server);
+var cors = require('cors');
+var io = require('socket.io')(server);
+require('./socket.io/socket.io')(io);
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
+app.use(cors());
 app.use(function(req, res, next){
 	res.header('Access-Control-Allow-Origin', '*');
 	res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');

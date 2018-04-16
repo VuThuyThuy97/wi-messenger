@@ -1,39 +1,28 @@
 
 module.exports = function (io) {
         io.on('connection', function(socket) {
-
                 socket.emit('connection', 'wellcome in chat-module');
-        
-                socket.on('listRoom', function (data) {
-                        data.forEach(function(room) {
-                                socket.join(room.id);
+                socket.on('join-rooms', function (listConver) {
+                        listConver.forEach(function(conver) {
+                                socket.join(conver.id);
                         });
                 });
-                // socket.on('test', function (params) {
-                // 	console.log('test');
-                // })
+                socket.on('invite-join-room', function(data) {
+                        socket.join(data.idConversation);
+                        socket.broadcast.emit('invite-join-room', data);
+                });
+                socket.on('accept-join-romm', function(id) {
+                        socket.join(id);
+                });
                 socket.on('sendMessage', function(data){
-                        
-                        // console.log(data.content);
-                        io.in(data.conversation.id).emit('receiveMessage', data);
+                        io.in(data.idConversation).emit('sendMessage', data);
                 });
-                socket.on('joinRoomAdded', function (data) {
-                        socket.join(data.id);
-                })
-                socket.on('addConver', function (data) {
-                        console.log(data.id);
-                        socket.join(data.conver.id);
-                        if(data.conver.Users.length==1){
-                                data.conver.title = data.sender.username;
-                                data.conver.avatar = data.sender.avatar;
-                        }
-                        socket.broadcast.emit('addListConver', data);
+                socket.on('invite-join-group', function (data) {
+                        socket.join(data.idConversation);
+                        socket.broadcast.emit('invite-join-group', data);
                 });
-                socket.on('addUser', function (data) {
-                        io.sockets.emit('addUserToConver', data);
+                socket.on('accept-foin-group', function (id) {
+                        socket.join(id);
                 });
-                socket.on('joinRoom', function(data){
-                        socket.join(data.conver.id);
-                })
         });
 };

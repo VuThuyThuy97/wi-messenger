@@ -84,19 +84,15 @@ module.exports.createConversation = function (req, res) {
 
 }
 module.exports.updateConversation = function (req, res) {
-	Conversation.findById(req.body.idConversation, {
-		include: User
-	}).then(conversation => {
-		if (conversation && conversation.Users.find(function (user) { return user.id === req.decoded.id })) {
+	Conversation.findById(req.body.idConversation).then(conversation => {
+		if (conversation) {
 			conversation.update({
-				title: req.body.title || conversation.title,
-				avatar: req.body.avatar || conversation.avatar
-			})
-				.then(conversation => {
-					res.send(response(200, 'SUCCESSFULLY', conversation));
-				}).catch(err => {
-					res.send(response(404, 'SOMETHING WENT WRONG'));
-				})
+				title: req.body.title
+			}).then(conver => {
+				res.send(response(200, 'SUCCESSFULLY', conver.id));
+            }).catch(err => {
+				res.send(response(404, 'SOMETHING WENT WRONG'));
+            });
 		} else {
 			res.send(response(404, 'CONVERSATION NOT FOUND'));
 		}
@@ -110,18 +106,7 @@ module.exports.addUserToConversation = function (req, res) {
 			if (conversation) {
 				let ids = req.body.idUsers;
 				conversation.addUsers(ids);
-				Conversation.findOne({ id: conversation.id }, {
-					include: [{
-						model: Message,
-						include: { model: User }
-					}, {
-						model: User
-					}]
-				}).then(conver => {
-					res.send(response(200, 'SUCCESSFULLy', conver));
-				}).catch(err => {
-					res.send(response(400, 'CONVERSATION NOT FOUND'));
-				});
+                res.send(response(200, 'SUCCESSFULLY', conversation.id));
 			} else {
 				res.send(response(404, 'CONVERSATION NOT FOUND'));
 			}
