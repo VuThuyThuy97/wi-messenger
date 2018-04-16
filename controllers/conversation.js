@@ -21,8 +21,8 @@ var Message = models.Message;
 // 	})
 // }
 
-module.exports.getConversation = function(req, res) {
-    Conversation.findById(req.body.idConversation,{
+module.exports.getConversation = function (req, res) {
+	Conversation.findById(req.body.idConversation, {
 		include: [{
 			model: User,
 		}, {
@@ -31,82 +31,83 @@ module.exports.getConversation = function(req, res) {
 				model: User,
 			}
 		}]
-	}).then(conver=>{
-		if(conver){
+	}).then(conver => {
+		if (conver) {
 			res.send(response(200, 'SUCCESSFULLY', conver));
-		} else{
+		} else {
 			res.send(response(404, 'CONVERSATION NOT FOUND'));
 		}
-    }).catch(err=>{
+	}).catch(err => {
 		res.send(response(404, 'SOMETHING WENT WRONG'));
-    })
+	})
 }
-module.exports.createConversation = function (req,res) {
-	Conversation.findOne({
-		where: { id: req.body.id },
-		include: [{
-			model: Message,
-			include: { model: User }
-		}, {
-			model: User
-		}]
-	}).then(conver=>{
-		if(conver)
-			res.send(response(400, 'COVERSATION EXISTED', conver));
-		else {
-			Conversation.create({
-				id: req.body.id,
-				title: req.body.title
-			}).then(data=>{
-				let ids = req.body.idUsers;
-				data.setUsers(ids);
-				res.send(response(200, 'SUCCESSFULLY', req.body.id));
-				// Conversation.findOne({
-				// 	where: { id: req.body.id },
-				// 	include: [{
-				// 		model: Message,
-				// 		include: { model: User }
-				// 	}, {
-				// 		model: User
-				// 	}]
-				// }).then(con=>{
-				// 	res.send(response(200, 'SUCCESSFULLY', con));
-				// }).catch(err=>{
-				// 	res.send(response(400, 'CONVERSATION NOT FOUND'));
-				// });
-			}).catch(err=>{
-				res.send(response(404, 'SOMETHING WENT WRONG'));
-			});
-		}
-	}).catch(err=> {
+module.exports.createConversation = function (req, res) {
+	if (req.body.type == 'group') {
+		Conversation.create({
+			title: req.body.title,
+			type: req.body.type
+		}).then(data => {
+			let ids = req.body.idUsers;
+			data.setUsers(ids);
+			res.send(response(200, 'SUCCESSFULLY', data.id));
+		}).catch(err => {
+			res.send(response(404, 'SOMETHING WENT WRONG'));
+		});
+	} else {
+		Conversation.findOne({
+			where: { title: req.body.title },
+			include: [{
+				model: Message,
+				include: { model: User }
+			}, {
+				model: User
+			}]
+		}).then(conver => {
+			if (conver)
+				res.send(response(400, 'COVERSATION EXISTED', conver));
+			else {
+				Conversation.create({
+					title: req.body.title,
+					type: req.body.type
+				}).then(data => {
+					let ids = req.body.idUsers;
+					data.setUsers(ids);
+					res.send(response(200, 'SUCCESSFULLY', data.id));
+				}).catch(err => {
+					res.send(response(404, 'SOMETHING WENT WRONG'));
+				});
+			}
+		}).catch(err => {
 
-	});
+		});
+	}
+
 }
-module.exports.updateConversation = function(req,res) {
+module.exports.updateConversation = function (req, res) {
 	Conversation.findById(req.body.idConversation, {
 		include: User
-	}).then(conversation=>{
-		if(conversation && conversation.Users.find(function(user){return user.id === req.decoded.id})) {
+	}).then(conversation => {
+		if (conversation && conversation.Users.find(function (user) { return user.id === req.decoded.id })) {
 			conversation.update({
 				title: req.body.title || conversation.title,
 				avatar: req.body.avatar || conversation.avatar
 			})
-			.then(conversation => {
-				res.send(response(200, 'SUCCESSFULLY', conversation));
-			}).catch(err=>{
-				res.send(response(404, 'SOMETHING WENT WRONG'));
-			})
+				.then(conversation => {
+					res.send(response(200, 'SUCCESSFULLY', conversation));
+				}).catch(err => {
+					res.send(response(404, 'SOMETHING WENT WRONG'));
+				})
 		} else {
 			res.send(response(404, 'CONVERSATION NOT FOUND'));
 		}
-	}).catch(err=>{
+	}).catch(err => {
 		res.send(response(404, 'SOMETHING WENT WRONG'));
 	})
 }
-module.exports.addUserToConversation = function(req,res) {
+module.exports.addUserToConversation = function (req, res) {
 	Conversation.findById(req.body.idConversation)
-		.then(function(conversation) {
-			if(conversation){
+		.then(function (conversation) {
+			if (conversation) {
 				let ids = req.body.idUsers;
 				conversation.addUsers(ids);
 				Conversation.findOne({ id: conversation.id }, {
@@ -116,15 +117,15 @@ module.exports.addUserToConversation = function(req,res) {
 					}, {
 						model: User
 					}]
-				}).then(conver=>{
+				}).then(conver => {
 					res.send(response(200, 'SUCCESSFULLy', conver));
-				}).catch(err=>{
+				}).catch(err => {
 					res.send(response(400, 'CONVERSATION NOT FOUND'));
 				});
-			} else{
-				res.send(response(404,'CONVERSATION NOT FOUND'));
-			}	
-		}).catch(err=>{
+			} else {
+				res.send(response(404, 'CONVERSATION NOT FOUND'));
+			}
+		}).catch(err => {
 			res.send(response(404, 'SOMETHING WENT WRONG'));
 		});
 }

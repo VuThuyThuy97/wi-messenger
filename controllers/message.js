@@ -18,10 +18,11 @@ module.exports.sendMessage = function (req, res) {
 				message: req.body.message,
 				message_type: req.body.messageType,
 				conversation_id: req.body.idConversation,
-				sender_id : req.body.idUser
+				sender_id : req.body.idUser,
+				createdAt: new Date()
 			}).then(message => {
 				if(message)
-					Message.findById({
+					Message.findOne({
 						where: { id: message.id },
 						include: { model: User }
 					}).then(data=>{
