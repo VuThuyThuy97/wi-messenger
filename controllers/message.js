@@ -13,23 +13,16 @@ module.exports.sendMessage = function (req, res) {
 			}
 		}
 	}).then(conversation => {
-		if(conversation){
+		if (conversation) {
 			Message.create({
 				message: req.body.message,
-				message_type: req.body.messageType,
+				message_type: req.body.message_type,
 				conversation_id: req.body.idConversation,
-				sender_id : req.body.idUser,
+				sender_id: req.body.idUser,
 				createdAt: new Date()
 			}).then(message => {
-				if(message)
-					Message.findOne({
-						where: { id: message.id },
-						include: { model: User }
-					}).then(data=>{
-						res.send(response(200, 'SUCCESSFULLY', data));
-					}).catch(err=> {
-
-					});
+				if (message)
+					res.send(response(200, 'SUCCESSFULLY', message));
 				else
 					res.send(response(404, 'SOMETHING WENT WRONG'));
 			}).catch(err => {
@@ -38,7 +31,7 @@ module.exports.sendMessage = function (req, res) {
 		} else {
 			res.send(response(404, 'CONVERSATION NOT FOUND'));
 		}
-	}).catch(err=>{
+	}).catch(err => {
 		res.send(response(404, 'SOMETHING WENT WRONG'));
 	})
 }
@@ -57,19 +50,19 @@ module.exports.getMessage = function (req, res) {
 			conversation_id: req.body.idConversation
 		},
 	}).then(data => {
-		if(data){
+		if (data) {
 			let rs = [];
-			for(d of data){
-				if(d.Conversation.Users.find(function(user){return user.id === req.decoded.id})){
+			for (d of data) {
+				if (d.Conversation.Users.find(function (user) { return user.id === req.decoded.id })) {
 					rs.push(d);
-					if(d===data[data.length-1] && rs.length>0){
+					if (d === data[data.length - 1] && rs.length > 0) {
 						res.send(200, 'SUCCESSFULLY', rs);
 					} else {
 						res.send(404, 'MESSAGES NOT FOUND');
 					}
 				}
 			}
-			
+
 		} else {
 			res.send(response(404, 'CONVERSATION NOT FOUND'));
 		}
