@@ -1,28 +1,24 @@
 var async = require('async');
+var fs = require('fs');
 var models = require('../database/db-connect');
 var response = require('./response');
 var User = models.User;
 var Conversation = models.Conversation;
 var Message = models.Message;
 
-// module.exports.getConversationList = function(req, res){
-// 	User.findOne({
-// 		include: {
-// 			model: Conversation,
-// 			include : {model: User}
-// 		},
-// 		where: {
-// 			email: req.params.email
-// 		}
-// 	}).then(data => {
-// 		res.send(data.Conversations);
-// 	}).catch(err => {
-// 		res.send('err');
-// 	})
-// }
-
-module.exports.getConversation = function (req, res) {
-	Conversation.findById(req.body.idConversation, {
+var create = function(req, res, cb) {
+	Conversation.create({
+		id: 1,
+		title: req.body.title
+	}).then(data => {
+		// data.setUsers(req.body.idUsers);
+		fs.mkdirSync('../database/uploads/' + req.body.title);
+		cb(200);
+	}).catch(err => { cb(400); });
+}
+var get = function(req, res, cb) {
+	Conversation.findOne({
+		where: req.body,
 		include: [{
 			model: User,
 		}, {
@@ -31,86 +27,38 @@ module.exports.getConversation = function (req, res) {
 				model: User,
 			}
 		}]
-	}).then(conver => {
-		if (conver) {
-			res.send(response(200, 'SUCCESSFULLY', conver));
-		} else {
-			res.send(response(404, 'CONVERSATION NOT FOUND'));
-		}
-	}).catch(err => {
-		res.send(response(404, 'SOMETHING WENT WRONG'));
-	})
+	}).then(data => { if(data) cb(200, data); cb(404)})
+	.catch(err => { cb(400);} );
+}
+var update = function(req, res, cb) {
+	Conversation.update(req.body)
+	.then(data => { cb(200); })
+	.catch(err => { cb(400); });
+}
+module.exports.getConversation = function (req, res) {
+	get(req, res, function(code, data) {
+		if(code==400) res.send(response(code, 'SOMETHING WENT WRONG'));
+		if(code==200)res.send(response(code, 'SUCCESSFULLY', data));
+		if(code==404) res.send(response(code, 'NOT FOUND'));
+	});
 }
 module.exports.createConversation = function (req, res) {
-	if (req.body.type == 'group') {
-		Conversation.create({
-			title: req.body.title,
-			type: req.body.type
-		}).then(data => {
-			let ids = req.body.idUsers;
-			data.setUsers(ids);
-			res.send(response(200, 'SUCCESSFULLY', data.id));
-		}).catch(err => {
-			res.send(response(404, 'SOMETHING WENT WRONG'));
-		});
-	} else {
-		Conversation.findOne({
-			where: { title: req.body.title },
-			include: [{
-				model: Message,
-				include: { model: User }
-			}, {
-				model: User
-			}]
-		}).then(conver => {
-			if (conver)
-				res.send(response(400, 'COVERSATION EXISTED', conver));
-			else {
-				Conversation.create({
-					title: req.body.title,
-					type: req.body.type
-				}).then(data => {
-					let ids = req.body.idUsers;
-					data.setUsers(ids);
-					res.send(response(200, 'SUCCESSFULLY', data.id));
-				}).catch(err => {
-					res.send(response(404, 'SOMETHING WENT WRONG'));
-				});
-			}
-		}).catch(err => {
-
-		});
-	}
-
+	create(req, res, function(code) {
+		if(code!=200) res.send(response(code, 'SOMETHING WENT WRONG'));
+		else res.send(response(code, 'SUCCESSFULLY'));
+	});
 }
 module.exports.updateConversation = function (req, res) {
-	Conversation.findById(req.body.idConversation).then(conversation => {
-		if (conversation) {
-			conversation.update({
-				title: req.body.title
-			}).then(conver => {
-				res.send(response(200, 'SUCCESSFULLY', conver.id));
-            }).catch(err => {
-				res.send(response(404, 'SOMETHING WENT WRONG'));
-            });
-		} else {
-			res.send(response(404, 'CONVERSATION NOT FOUND'));
-		}
-	}).catch(err => {
-		res.send(response(404, 'SOMETHING WENT WRONG'));
-	})
+	res.send(response(200, 'SUCCESSFULLY'));
 }
 module.exports.addUserToConversation = function (req, res) {
-	Conversation.findById(req.body.idConversation)
-		.then(function (conversation) {
-			if (conversation) {
-				let ids = req.body.idUsers;
-				conversation.addUsers(ids);
-                res.send(response(200, 'SUCCESSFULLY', conversation.id));
-			} else {
-				res.send(response(404, 'CONVERSATION NOT FOUND'));
-			}
-		}).catch(err => {
-			res.send(response(404, 'SOMETHING WENT WRONG'));
-		});
+	let condition = { title: req.body.title };
+	get(condition, res, function(code, data) {
+		if(code==400) res.send(response(code, 'SOMETHING WENT WRONG'));
+		if(code==200) {
+			data.addUsers(req.body.idUsers);
+			res.send(response(code, 'SUCCESSFULLY'));
+		}
+		if(code==404) res.send(response(code, 'NOT FOUND'));
+	});
 }

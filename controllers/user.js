@@ -36,15 +36,6 @@ module.exports.getUserByToken = function(req, res) {
 	User.findOne({
 		where: {
 			username: req.decoded.username
-		},
-		include: {
-			model: Conversation,
-			include: [{
-				model: Message,
-				include: { model: User }
-			}, {
-				model: User
-			}]
 		}
 	}).then(user=> {
 		if(user){	
@@ -61,15 +52,6 @@ module.exports.getUserById = function(req, res) {
 	User.findOne({
 		where: {
 			id: req.body.idUser
-		},
-		include: {
-			model: Conversation,
-			include: [{
-				model: Message,
-				include: { model: User }
-			}, {
-				model: User
-			}]
 		}
 	}).then(user=> {
 		if(user){	
