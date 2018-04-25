@@ -10,16 +10,16 @@ var sequelize = new Sequelize("chat_module", "root", "", {
 var Op = Sequelize.Op;
 var db = {};
 fs
-    .readdirSync(__dirname)
-    .filter(function(file) {
+    .readdirSync(path.join(__dirname, 'schemas'))
+    .filter((file) => {
         return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js');
     })
-    .forEach(function(file) {
-        var model = sequelize['import'](path.join(__dirname, file));
+    .forEach((file) => {
+        var model = sequelize['import'](path.join(__dirname, 'schemas',file));
         db[model.name] = model;
     });
 
-Object.keys(db).forEach(function(modelName) {
+Object.keys(db).forEach((modelName) => {
     if (db[modelName].associate) {
         db[modelName].associate(db);
     }
@@ -36,30 +36,30 @@ db.User.belongsToMany(db.Conversation, {
 });
 db.Conversation.hasMany(db.Message, {
     foreignKey: {
-        name: 'conversation_id',
+        name: 'idConversation',
         allowNull: false
     }
 })
 db.Message.belongsTo(db.Conversation, {
     foreignKey: {
-        name: 'conversation_id',
+        name: 'idConversation',
         allowNull: false
     }
 });
 db.User.hasMany(db.Message, {
     foreignKey: {
-        name: 'sender_id',
+        name: 'idSender',
         allowNull: false
     }
 })
 db.Message.belongsTo(db.User, {
-    foreignKey: 'sender_id',
+    foreignKey: 'idSender',
     targetKey: 'id'
 });
 sequelize.sync().then(()=>{
-    console.log('sync success', db.User);
+    console.log('\n============================ SYNC DATABASE SUCCESS ====================\n');
 }).catch(err=>{
-    console.log('sync err');
+    console.log('\n============================ SYNC DATABASE ERROR ======================\n');
 })
 
 db.sequelize = sequelize;

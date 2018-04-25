@@ -1,5 +1,5 @@
 'use strict';
-module.exports = function (sequelize, DataTypes) {
+module.exports = (sequelize, DataTypes) => {
     var Conversation = sequelize.define('Conversation', {
         id: {
             type: DataTypes.INTEGER,
@@ -7,10 +7,11 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: false,
             primaryKey: true
         },
-        title: {
+        name: {
             type: DataTypes.STRING(100),
-            allowNull: false
+            allowNull: true
         }
     });
+
     return Conversation;
 };

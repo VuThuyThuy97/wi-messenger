@@ -1,66 +1,22 @@
-var formidable = require('formidable');
 var fs = require('fs');
 var jsonResponse = require('./response');
 
-module.exports.postFile = function(req,res) {
-    var form = new formidable.IncomingForm();
-    form.parse(req);
-    form.on('fileBegin', function(name, file) {
-        file.name = Date.now() + '_' + file.name;
-        file.path = "./database/uploads/file/" + file.name;
-    })
-    form.on('file', function(name, file){
-        res.json({
-            status: 100,
-            content: 'file/'+file.name
+module.exports.upload = (req, res) => {
+    fs.access('./database/upload/' + req.body.name, (err) => {
+        if (err)
+            fs.mkdirSync('./database/upload/' + req.body.name);
+        else
+            console.log('exist');
+
+        let file = req.files.file;
+        let fileName = Date().split(' ').join('') + file.name;
+        let path = './database/upload/' + req.body.name + '/' + fileName;
+        fs.copyFile(file.path, path, (err) => {
+            if (err)
+                res.send(jsonResponse(400, 'UPLOAD FAIL'));
+            else
+                res.send(jsonResponse(200, 'SUCCESSFULLY', 'http://13.251.24.65:5000/' + req.body.name + '/' + fileName));
         });
+
     })
-    form.on('error', function (err) {
-        res.json({
-            status: 101
-        });
-    });
-    form.on('end', function () {
-    });
-}
-module.exports.postImage = function (req, res) {
-    var form = new formidable.IncomingForm();
-    form.parse(req);
-    form.on('fileBegin', function(name, file) {
-        file.name = Date.now() + '_' + file.name;
-        file.path = "./database/uploads/image/" + file.name;
-    })
-    form.on('file', function(name, file){
-        res.json({
-            status: 100,
-            content: 'image/'+file.name
-        });
-    })
-    form.on('error', function (err) {
-        res.json({status: 101});
-    });
-    form.on('end', function () {
-    });
-}
-module.exports.postAvatar = function(req, res) {
-    var form = new formidable.IncomingForm();
-    form.parse(req);
-    form.on('fileBegin', function(name, file) {
-        file.name = Date.now() + '_' + file.name;
-        file.path = "./database/uploads/avatar/" + file.name;
-    })
-    form.on('file', function(name, file){
-        console.log('uploaded avatar', file.name);
-        res.json({
-            status: 100,
-            content: 'avatar/'+file.name
-        });
-    })
-    form.on('error', function (err) {
-        console.log('An error has occured: \n' + err);
-        res.json({status: 101});
-    });
-    form.on('end', function () {
-        console.log('done upload!');
-    });
-}
+};

@@ -1,4 +1,4 @@
-module.exports = function (sequelize, DataTypes) {
+module.exports = (sequelize, DataTypes) => {
     return sequelize.define('Message', {
         id: {
             type: DataTypes.INTEGER,
@@ -6,19 +6,19 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: false,
             primaryKey: true
         },
-        conversation_id: {
+        idConversation: {
             type: DataTypes.INTEGER,
             allowNull: false
         },
-        sender_id: {
+        idSender: {
             type: DataTypes.INTEGER,
             allowNull: false
         },
-        message: {
+        content: {
             type: DataTypes.TEXT,
             allowNull: true
         },
-        message_type:{
+        type:{
             type: DataTypes.STRING(50),
             allowNull: false
         }
